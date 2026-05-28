@@ -223,6 +223,39 @@ play/pause/speed/skip. A shared `util/new-career.ts` is reused by both the norma
 "Nova carreira" flow and watch mode. Covered by the gandula test suite
 (`watch-playbook.test.ts`, `WatchView.test.tsx`).
 
+## Performance
+
+Training is **environment-bound** (the wasm game sims), not network-bound — the
+policy is a tiny MLP. So:
+
+- **No GPU.** Apple Metal (MPS) is ~2× *slower* here than CPU (tiny tensors,
+  per-step host/device overhead). A `--device` flag exists if you want to verify.
+- **The bridge is already cheap.** A step with no simulation round-trips in
+  ~0.1 ms; ~100% of the cost is `run_season` (each season-advance simulates both
+  divisions).
+
+Two optimizations are applied:
+
+1. **Light engine (on by default).** The RL path never reads the minute-by-minute
+   match event log, so the harness calls event-stripped wasm exports
+   (`run_season_light` / `play_match_light`, mapped in `harness/wasm-node-shim.cjs`).
+   This avoids building a JS object per event across the wasm boundary — ~25%
+   cheaper (reset 5.35→4.03 ms, season step 6.57→5.06 ms). The web app is
+   untouched (it still uses the full event log for the match reveal).
+2. **Parallel envs.** Set `--n-envs` to roughly your performance-core count.
+   Sweep on an M4 Pro (10 P-cores), light engine:
+
+   | n_envs | 4 | 8 | 10 | 12 | 14 |
+   |--------|---|---|----|----|----|
+   | fps    |1169|1394|1505|**1558**|1612|
+
+   Sublinear past ~10 (PPO's synchronous update barrier + lockstep
+   `SubprocVecEnv`). `--n-envs 12` is the sweet spot here; combined with the light
+   engine that's ~1.35× over the original 8-env/full-engine throughput.
+
+Further gains would need a native in-process env (PyO3, no JS/serde) — not worth
+it at this scale (2M steps ≈ ~30 min).
+
 ## Layout
 
 ```

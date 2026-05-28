@@ -20,7 +20,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const WASM_NODE = path.join(HERE, "wasm-node", "gandula_wasm.js");
+// Point at the shim (not the raw wasm module) so the harness uses the *light*
+// engine variants — see wasm-node-shim.cjs.
+const WASM_NODE = path.join(HERE, "wasm-node-shim.cjs");
 const TEAMS_NODE = path.join(HERE, "src", "teams-node.ts");
 
 /** Redirect the gandula web imports that don't run under Node. */

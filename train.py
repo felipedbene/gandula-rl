@@ -43,6 +43,11 @@ def main():
     ap.add_argument("--out", type=str, default="models/maskppo_gandula")
     ap.add_argument("--tb", type=str, default="runs")
     ap.add_argument("--progress", action="store_true")
+    # cpu | mps (Apple Metal) | cuda | auto. NOTE: this workload is env-bound
+    # (Node game sims), not net-bound — the policy is a tiny MLP, so "mps" is
+    # usually no faster (often slower) than "cpu". The real speed lever is
+    # --n-envs. Kept here so you can benchmark for yourself.
+    ap.add_argument("--device", type=str, default="cpu")
     args = ap.parse_args()
 
     venv = SubprocVecEnv([make_env(args.max_seasons, args.starter) for _ in range(args.n_envs)])
@@ -61,6 +66,7 @@ def main():
         clip_range=0.2,
         policy_kwargs=dict(net_arch=[256, 256]),
         tensorboard_log=args.tb,
+        device=args.device,
         verbose=1,
     )
 
