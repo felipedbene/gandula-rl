@@ -1,0 +1,20 @@
+[project]
+name = "gandula-rl"
+version = "0.1.0"
+description = "Reinforcement-learning agent that wins Gandula careers."
+requires-python = ">=3.10"
+dependencies = [
+    "gymnasium>=0.29",
+    "numpy>=1.26",
+    "stable-baselines3>=2.3",
+    "sb3-contrib>=2.3",
+    "torch>=2.2",
+    "tensorboard>=2.16",
+]
+
+[tool.setuptools]
+packages = ["gandula_env"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

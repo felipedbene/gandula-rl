@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# RL artifacts
+models/
+runs/
+
+# Node / harness
+harness/node_modules/
+harness/dist/
+harness/wasm-node/
+
+# Local agent/editor state
+.claude/
+
+# OS
+.DS_Store

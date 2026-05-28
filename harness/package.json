@@ -1,0 +1,18 @@
+{
+  "name": "gandula-rl-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless bridge to the Gandula game engine + career logic for RL training.",
+  "scripts": {
+    "smoke": "node src/smoke.cjs",
+    "build": "node build.mjs",
+    "server": "node dist/server.cjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2"
+  },
+  "dependencies": {
+    "idb": "^8.0.3"
+  }
+}

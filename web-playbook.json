@@ -1,0 +1,411 @@
+{
+  "seed": 474640,
+  "starterId": 629,
+  "starterName": "Real Madri",
+  "maxSeasons": 8,
+  "seasons": [
+    {
+      "year": 2026,
+      "tier": 2,
+      "transfers": [
+        {
+          "kind": "sell",
+          "playerId": 62912,
+          "name": "Daniel Lopes",
+          "position": "DEF",
+          "price": 263325
+        },
+        {
+          "kind": "sell",
+          "playerId": 62913,
+          "name": "Marcelo Oliveira",
+          "position": "MID",
+          "price": 300318
+        }
+      ],
+      "tactics": {
+        "formation": "F4231",
+        "tactics": {
+          "mentality": "VeryAttacking",
+          "tempo": "Fast",
+          "pressing": "Medium",
+          "width": "Wide"
+        },
+        "starting_xi": [
+          62908,
+          62904,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62916,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          62914,
+          62906,
+          62909
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 2,
+        "points": 27,
+        "outcome": "promoted",
+        "money": 1565643
+      }
+    },
+    {
+      "year": 2027,
+      "tier": 1,
+      "transfers": [
+        {
+          "kind": "buy",
+          "playerId": 901001,
+          "name": "Fernando Carvalho",
+          "position": "GK",
+          "price": 390150
+        }
+      ],
+      "tactics": {
+        "formation": "F442",
+        "tactics": {
+          "mentality": "VeryDefensive",
+          "tempo": "Slow",
+          "pressing": "Low",
+          "width": "Narrow"
+        },
+        "starting_xi": [
+          62908,
+          62904,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62916,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          62914,
+          62906,
+          62909,
+          901001
+        ]
+      },
+      "result": {
+        "tier": 1,
+        "position": 8,
+        "points": 8,
+        "outcome": "relegated",
+        "money": 1651493
+      }
+    },
+    {
+      "year": 2028,
+      "tier": 2,
+      "transfers": [
+        {
+          "kind": "buy",
+          "playerId": 902001,
+          "name": "Diego Costa",
+          "position": "GK",
+          "price": 305793
+        },
+        {
+          "kind": "sell",
+          "playerId": 62914,
+          "name": "Gervásio Zaluar",
+          "position": "MID",
+          "price": 173472
+        },
+        {
+          "kind": "buy",
+          "playerId": 902000,
+          "name": "Diego Barbosa",
+          "position": "GK",
+          "price": 334469
+        }
+      ],
+      "tactics": {
+        "formation": "F4231",
+        "tactics": {
+          "mentality": "VeryAttacking",
+          "tempo": "Fast",
+          "pressing": "Low",
+          "width": "Normal"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62916,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          62906,
+          62909,
+          901001,
+          62908,
+          902001
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 1,
+        "points": 30,
+        "outcome": "promoted",
+        "money": 993703
+      }
+    },
+    {
+      "year": 2029,
+      "tier": 1,
+      "transfers": [
+        {
+          "kind": "buy",
+          "playerId": 903001,
+          "name": "Alex Cunha",
+          "position": "GK",
+          "price": 94738
+        }
+      ],
+      "tactics": {
+        "formation": "F442",
+        "tactics": {
+          "mentality": "VeryDefensive",
+          "tempo": "Slow",
+          "pressing": "Low",
+          "width": "Narrow"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62902,
+          62910,
+          62903,
+          62916,
+          62905,
+          62911,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          62909,
+          62906,
+          901001,
+          902001,
+          903001,
+          62908
+        ]
+      },
+      "result": {
+        "tier": 1,
+        "position": 8,
+        "points": 10,
+        "outcome": "relegated",
+        "money": 1368965
+      }
+    },
+    {
+      "year": 2030,
+      "tier": 2,
+      "transfers": [
+        {
+          "kind": "buy",
+          "playerId": 904001,
+          "name": "Paulo Martins",
+          "position": "GK",
+          "price": 106470
+        }
+      ],
+      "tactics": {
+        "formation": "F352",
+        "tactics": {
+          "mentality": "Defensive",
+          "tempo": "Fast",
+          "pressing": "High",
+          "width": "Wide"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62902,
+          62910,
+          62916,
+          62903,
+          62905,
+          62911,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          901001,
+          62909,
+          62906,
+          902001,
+          903001,
+          62908,
+          904001
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 7,
+        "points": 17,
+        "outcome": "stayed",
+        "money": 1070495
+      }
+    },
+    {
+      "year": 2031,
+      "tier": 2,
+      "transfers": [
+        {
+          "kind": "buy",
+          "playerId": 905001,
+          "name": "Thiago Gomes",
+          "position": "GK",
+          "price": 130721
+        }
+      ],
+      "tactics": {
+        "formation": "F352",
+        "tactics": {
+          "mentality": "Defensive",
+          "tempo": "Fast",
+          "pressing": "High",
+          "width": "Wide"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62916,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62901,
+          62907,
+          62915
+        ],
+        "bench": [
+          905001,
+          901001,
+          62909,
+          62906,
+          902001,
+          903001,
+          62908
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 3,
+        "points": 24,
+        "outcome": "stayed",
+        "money": 948774
+      }
+    },
+    {
+      "year": 2032,
+      "tier": 2,
+      "transfers": [],
+      "tactics": {
+        "formation": "F352",
+        "tactics": {
+          "mentality": "Defensive",
+          "tempo": "Fast",
+          "pressing": "High",
+          "width": "Wide"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62916,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62907,
+          62901,
+          62915
+        ],
+        "bench": [
+          905001,
+          901001,
+          62909,
+          62906,
+          902001,
+          903001,
+          62908
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 6,
+        "points": 22,
+        "outcome": "stayed",
+        "money": 957774
+      }
+    },
+    {
+      "year": 2033,
+      "tier": 2,
+      "transfers": [],
+      "tactics": {
+        "formation": "F352",
+        "tactics": {
+          "mentality": "Defensive",
+          "tempo": "Fast",
+          "pressing": "High",
+          "width": "Wide"
+        },
+        "starting_xi": [
+          902000,
+          62904,
+          62916,
+          62902,
+          62910,
+          62903,
+          62905,
+          62911,
+          62907,
+          62901,
+          62915
+        ],
+        "bench": [
+          901001,
+          905001,
+          62909,
+          902001,
+          62906,
+          903001,
+          62908
+        ]
+      },
+      "result": {
+        "tier": 2,
+        "position": 8,
+        "points": 17,
+        "outcome": "stayed",
+        "money": 972774
+      }
+    }
+  ]
+}
