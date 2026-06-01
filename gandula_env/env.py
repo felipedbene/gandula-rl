@@ -26,7 +26,7 @@ HARNESS_DIR = Path(__file__).resolve().parent.parent / "harness"
 SERVER_JS = HARNESS_DIR / "dist" / "server.cjs"
 
 ACTION_DIM = 578
-OBS_DIM = 109
+OBS_DIM = 115  # mirror harness/src/encode.ts OBS_DIM (E.6: 3-tier one-hot + economy obs)
 
 
 class GandulaCareerEnv(gym.Env):

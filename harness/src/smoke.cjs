@@ -8,7 +8,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const wasm = require("../wasm-node/gandula_wasm.js");
 
-const GANDULA = "/Users/felipe/Projects/gandula";
+const GANDULA = "/home/felipe/Projects/gandula";
 
 function loadTeam(relPath) {
   return JSON.parse(fs.readFileSync(path.join(GANDULA, relPath), "utf8"));

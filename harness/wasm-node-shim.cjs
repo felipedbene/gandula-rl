@@ -10,8 +10,8 @@
 const w = require("./wasm-node/gandula_wasm.js");
 
 module.exports = {
-  play_match: w.play_match_light,
-  run_season: w.run_season_light,
+  play_match: w.play_match_light || w.play_match,
+  run_season: w.run_season_light || w.run_season,
   derive_match_seed: w.derive_match_seed,
   // Full-fidelity variants kept available if ever needed.
   play_match_full: w.play_match,

@@ -2,8 +2,9 @@
 // Python gandula_env/spaces.py). Keep the action layout + enum orders in sync
 // with the Python side.
 
-import { playerOverall } from "/Users/felipe/Projects/gandula/web/src/util/transfer-market";
-import type { Player, Team, UserTactics } from "/Users/felipe/Projects/gandula/web/src/types";
+import { playerOverall } from "/home/felipe/Projects/gandula/web/src/util/transfer-market";
+import { sponsorshipSeasonTotal } from "/home/felipe/Projects/gandula/web/src/util/finances";
+import type { Player, Team, UserTactics } from "/home/felipe/Projects/gandula/web/src/types";
 import type { CareerEngine } from "./career";
 
 // ---- enum orders (index ↔ value) ------------------------------------------
@@ -134,10 +135,15 @@ export function buildObs(e: CareerEngine, phase: Phase, last: LastSeason): numbe
     return s + avgAttr * 500;
   }, 0);
 
+  const tier = e.tier();
+  const mgr = e.career.manager;
   const obs: number[] = [
     phase === "transfer" ? 1 : 0,
     phase === "tactics" ? 1 : 0,
-    e.tier() === 2 ? 1 : 0,
+    // 3-tier one-hot (E.2): Série A / B / C.
+    tier === 1 ? 1 : 0,
+    tier === 2 ? 1 : 0,
+    tier === 3 ? 1 : 0,
     (e.career.currentSeason.year - 2026) / 10,
     e.money() / 1_000_000,
     totalSalary / 1_000_000,
@@ -145,6 +151,13 @@ export function buildObs(e: CareerEngine, phase: Phase, last: LastSeason): numbe
     str.midfield / 100,
     str.defense / 100,
     roster.length / 25,
+    // Economy substrate (E.4): so the policy can observe (and later learn to
+    // grow) the build-vs-buy state. Stadium/marketing aren't actions yet, but
+    // observing them is forward-compatible.
+    mgr.fanbase / 100_000,
+    mgr.stadiumCapacity / 100_000,
+    mgr.marketingMomentum / 40_000,
+    sponsorshipSeasonTotal(e.career) / 1_000_000,
   ];
 
   for (const ps of positionSummary(roster)) {
@@ -180,7 +193,11 @@ export function buildObs(e: CareerEngine, phase: Phase, last: LastSeason): numbe
   return obs;
 }
 
-export const OBS_DIM = 2 + 1 + 1 + 2 + 3 + 1 + POSITIONS.length * 3 + 3 + N_AGENTS * 7; // 109
+// Head block: 2 (phase) + 3 (tier one-hot) + 1 (year) + 1 (money) + 1 (salary)
+// + 3 (squad strength) + 1 (roster len) + 4 (economy: fanbase, capacity,
+// momentum, sponsorship) = 16. Then per-position (4×3), last-season (3), and
+// the 12 free agents (×7).
+export const OBS_DIM = 16 + POSITIONS.length * 3 + 3 + N_AGENTS * 7; // 115
 
 // ---- action mask -----------------------------------------------------------
 /** Stable roster ordering for sell-slot indexing: by id ascending. */
@@ -215,7 +232,7 @@ export function buildMask(e: CareerEngine, phase: Phase): boolean[] {
 
 // playerPrice("buy") without importing the symbol twice — re-derive via overall
 // is wrong; use the engine's own pricing through the agent list instead.
-import { playerPrice } from "/Users/felipe/Projects/gandula/web/src/util/transfer-market";
+import { playerPrice } from "/home/felipe/Projects/gandula/web/src/util/transfer-market";
 function buyPrice(p: Player): number {
   return playerPrice(p, "buy");
 }

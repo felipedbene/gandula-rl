@@ -33,19 +33,26 @@ def tactics_index(formation: str, mentality: str, tempo: str, pressing: str, wid
 
 
 # ---- observation offsets (see harness/src/encode.ts buildObs) --------------
+# E.6 layout (OBS_DIM 115): 3-tier one-hot + economy substrate added.
 O_PHASE_TRANSFER = 0
 O_PHASE_TACTICS = 1
-O_TIER_IS_B = 2
-O_YEAR = 3
-O_MONEY = 4
-O_SALARY = 5
-O_ATTACK = 6
-O_MID = 7
-O_DEF = 8
-O_ROSTER_SIZE = 9
-O_POS_SUMMARY = 10  # 4 positions x (count, best, avg)
-O_LAST = 22  # position, points, outcome
-O_AGENTS = 25  # 12 agents x (overall, isGK, isDEF, isMID, isFWD, price, affordable)
+O_TIER_IS_A = 2
+O_TIER_IS_B = 3
+O_TIER_IS_C = 4
+O_YEAR = 5
+O_MONEY = 6
+O_SALARY = 7
+O_ATTACK = 8
+O_MID = 9
+O_DEF = 10
+O_ROSTER_SIZE = 11
+O_FANBASE = 12
+O_STADIUM = 13
+O_MOMENTUM = 14
+O_SPONSORSHIP = 15
+O_POS_SUMMARY = 16  # 4 positions x (count, best, avg)
+O_LAST = 28  # position, points, outcome
+O_AGENTS = 31  # 12 agents x (overall, isGK, isDEF, isMID, isFWD, price, affordable)
 AGENT_STRIDE = 7
 
 
