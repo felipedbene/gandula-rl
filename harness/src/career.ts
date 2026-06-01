@@ -22,15 +22,28 @@ import {
   type Division,
   type Season,
   type UserTactics,
-} from "/Users/felipe/Projects/gandula/web/src/persistence";
-import type { Team, Player, SeasonRecord, TeamStats } from "/Users/felipe/Projects/gandula/web/src/types";
-import { computeStandings, points } from "/Users/felipe/Projects/gandula/web/src/types";
-import { divideIntoDivisions, pickStarterTeam } from "/Users/felipe/Projects/gandula/web/src/util/divisions";
-import { resimulateFromRound } from "/Users/felipe/Projects/gandula/web/src/util/resimulate";
-import { roundCashDelta, computeSeasonFinances, isManagerFired } from "/Users/felipe/Projects/gandula/web/src/util/finances";
-import { computePromotionRelegation, userOutcomeFromPRResult } from "/Users/felipe/Projects/gandula/web/src/util/promotion";
-import { advanceCareer } from "/Users/felipe/Projects/gandula/web/src/util/career";
-import { userTeam } from "/Users/felipe/Projects/gandula/web/src/util/roster";
+} from "/home/felipe/Projects/gandula/web/src/persistence";
+import type { Team, Player, SeasonRecord, TeamStats } from "/home/felipe/Projects/gandula/web/src/types";
+import { computeStandings, points } from "/home/felipe/Projects/gandula/web/src/types";
+import { divideIntoDivisions, pickStarterTeam } from "/home/felipe/Projects/gandula/web/src/util/divisions";
+import { resimulateFromRound } from "/home/felipe/Projects/gandula/web/src/util/resimulate";
+import {
+  roundCashDelta,
+  computeSeasonFinances,
+  cupPrizeForAdvance,
+  isManagerFired,
+  seedStadiumForTier,
+} from "/home/felipe/Projects/gandula/web/src/util/finances";
+import {
+  COPA_ROUND_AT_LEAGUE_ROUND,
+  cupSeedFor,
+  cupTeamResolver,
+  freshCopa,
+  playCupRound,
+} from "/home/felipe/Projects/gandula/web/src/util/copa";
+import { computePromotionRelegation, userOutcomeFromPRResult } from "/home/felipe/Projects/gandula/web/src/util/promotion";
+import { advanceCareer } from "/home/felipe/Projects/gandula/web/src/util/career";
+import { userTeam } from "/home/felipe/Projects/gandula/web/src/util/roster";
 import {
   generateFreeAgents,
   playerPrice,
@@ -38,7 +51,7 @@ import {
   canSell,
   MIN_ROSTER,
   MAX_ROSTER,
-} from "/Users/felipe/Projects/gandula/web/src/util/transfer-market";
+} from "/home/felipe/Projects/gandula/web/src/util/transfer-market";
 
 export type CareerStatus = "running" | "fired" | "ended";
 
@@ -48,19 +61,20 @@ export class CareerEngine {
   status: CareerStatus = "running";
 
   /** Create a fresh career. `seed` is the career seed; `starterId` lets the
-   *  caller fix which Série B club to manage (defaults to the deterministic
-   *  weakest team, matching pickStarterTeam). */
+   *  caller fix which Série C club to manage (defaults to the deterministic
+   *  weakest team, matching pickStarterTeam). Mirrors SeasonView.run() for the
+   *  v9 / 3-tier / full-economy game. */
   reset(seed: number | bigint, starterId?: number | "random"): void {
-    const { tierA, tierB } = divideIntoDivisions(ALL_TEAMS);
+    const [tierA, tierB, tierC] = divideIntoDivisions(ALL_TEAMS);
     let starter: Team;
     if (starterId === "random") {
-      // Website-faithful: any Série B club, but seeded so episodes reproduce.
-      const idx = Number(((BigInt(seed) % BigInt(tierB.length)) + BigInt(tierB.length)) % BigInt(tierB.length));
-      starter = tierB[idx];
+      // Website-faithful: any Série C club, but seeded so episodes reproduce.
+      const idx = Number(((BigInt(seed) % BigInt(tierC.length)) + BigInt(tierC.length)) % BigInt(tierC.length));
+      starter = tierC[idx];
     } else if (starterId !== undefined) {
       starter = mustTeam(starterId);
     } else {
-      starter = pickStarterTeam(tierB); // deterministic weakest — the hard case
+      starter = pickStarterTeam(tierC); // deterministic weakest — the hard case
     }
 
     const careerSeed = BigInt(seed);
@@ -68,6 +82,7 @@ export class CareerEngine {
 
     const recordA = run_season(tierA, seasonSeed ^ 1n, "Série A") as SeasonRecord;
     const recordB = run_season(tierB, seasonSeed ^ 2n, "Série B") as SeasonRecord;
+    const recordC = run_season(tierC, seasonSeed ^ 3n, "Série C") as SeasonRecord;
 
     const currentSeason: Season = {
       year: FIRST_YEAR,
@@ -75,18 +90,20 @@ export class CareerEngine {
       divisions: [
         { tier: 1, name: "Série A", record: recordA, currentRoundIdx: 0 },
         { tier: 2, name: "Série B", record: recordB, currentRoundIdx: 0 },
+        { tier: 3, name: "Série C", record: recordC, currentRoundIdx: 0 },
       ],
       transfers: [],
+      copa: freshCopa(),
     };
 
     this.career = {
-      schemaVersion: 5,
+      schemaVersion: 9,
       savedAt: new Date().toISOString(),
       seed: careerSeed,
       controlledTeamId: starter.id,
       seasons: [],
       currentSeason,
-      manager: { money: STARTING_MONEY },
+      manager: { money: STARTING_MONEY, ...seedStadiumForTier(3) },
       userRoster: [],
     };
     this.status = "running";
@@ -112,7 +129,7 @@ export class CareerEngine {
   money(): number {
     return this.career.manager.money;
   }
-  tier(): 1 | 2 {
+  tier(): 1 | 2 | 3 {
     return this.userDivision().tier;
   }
   /** The user's current squad (registry default until a transfer happens). */
@@ -251,17 +268,18 @@ export class CareerEngine {
    *  season is already finished (no-op). */
   advanceRound(): boolean {
     if (this.seasonFinished()) return false;
+    const season = this.career.currentSeason;
     const playedRound = this.currentRoundIdx();
     const cashDelta = roundCashDelta(this.career, playedRound);
 
     const userIdx = this.userDivIdx();
-    const divisions = this.career.currentSeason.divisions.map((d, i) => {
+    const divisions = season.divisions.map((d, i) => {
       const total = totalRoundsOf(d);
       if (i === userIdx) return { ...d, currentRoundIdx: d.currentRoundIdx + 1 };
       if (d.currentRoundIdx < total) return { ...d, currentRoundIdx: d.currentRoundIdx + 1 };
       return d;
     });
-    // Silent-advance: once the user's division ends, fast-forward the other.
+    // Silent-advance: once the user's division ends, fast-forward the others.
     const userAdvanced = divisions[userIdx];
     if (userAdvanced.currentRoundIdx >= totalRoundsOf(userAdvanced)) {
       divisions.forEach((d, i) => {
@@ -269,10 +287,27 @@ export class CareerEngine {
       });
     }
 
+    // Copa do Brasil matchday (E.3): on a mapped league round, play the cup
+    // round and pay the cup prize. Mirrors SeasonView.playRound.
+    let copa = season.copa;
+    let cupPrize = 0;
+    const cupRoundIdx = COPA_ROUND_AT_LEAGUE_ROUND.indexOf(playedRound);
+    if (cupRoundIdx >= 0 && copa.currentCupRoundIdx === cupRoundIdx) {
+      const nextCopa = playCupRound(
+        copa,
+        cupRoundIdx,
+        cupTeamResolver(this.career),
+        cupSeedFor(season),
+        this.career.controlledTeamId,
+      );
+      cupPrize = cupPrizeForAdvance(copa, nextCopa, this.career.controlledTeamId);
+      copa = nextCopa;
+    }
+
     this.career = {
       ...this.career,
-      currentSeason: { ...this.career.currentSeason, divisions },
-      manager: { ...this.career.manager, money: this.career.manager.money + cashDelta },
+      currentSeason: { ...season, divisions, copa },
+      manager: { ...this.career.manager, money: this.career.manager.money + cashDelta + cupPrize },
     };
 
     if (isManagerFired(this.career.manager.money)) {
@@ -294,22 +329,31 @@ export class CareerEngine {
     const pr = this.prResult();
     const userOutcome = userOutcomeFromPRResult(pr);
     const finances = computeSeasonFinances(this.career, userOutcome);
-    if (isManagerFired(this.career.manager.money + finances.prBonus)) {
+    // Boundary money = P/R bonus + placement prize (the per-round + cup pieces
+    // already accrued into manager.money). Mirrors SeasonView.advanceToNextSeason.
+    const boundaryDelta = finances.prBonus + finances.placementPrize;
+    if (isManagerFired(this.career.manager.money + boundaryDelta)) {
       this.career = {
         ...this.career,
-        manager: { ...this.career.manager, money: this.career.manager.money + finances.prBonus },
+        manager: { ...this.career.manager, money: this.career.manager.money + boundaryDelta },
       };
       this.status = "fired";
       return;
     }
-    const { history, nextSeason, agedUserRoster } = advanceCareer(this.career, pr);
+    const { history, nextSeason, agedUserRoster, nextFanbase, nextMarketingMomentum } =
+      advanceCareer(this.career, pr);
     this.career = {
       ...this.career,
       savedAt: new Date().toISOString(),
       seasons: [...this.career.seasons, history],
       currentSeason: nextSeason,
       userRoster: agedUserRoster,
-      manager: { ...this.career.manager, money: this.career.manager.money + finances.prBonus },
+      manager: {
+        ...this.career.manager,
+        money: this.career.manager.money + boundaryDelta,
+        fanbase: nextFanbase,
+        marketingMomentum: nextMarketingMomentum,
+      },
     };
   }
 }

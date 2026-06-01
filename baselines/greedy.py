@@ -24,7 +24,7 @@ from gandula_env.actions import (
     A_END_TRANSFERS,
     N_AGENTS,
     O_MONEY,
-    O_TIER_IS_B,
+    O_TIER_IS_A,
     agent_overall,
     agent_price,
     tactics_index,
@@ -33,14 +33,16 @@ from gandula_env.actions import (
 CASH_BUFFER = 0.30  # keep ≥300k (1e6 units) after a buy — survives wage dips
 MAX_BUYS_PER_SEASON = 99  # effectively uncapped; the buffer limits spend
 
-TACTIC_B = tactics_index("F433", "Attacking", "Fast", "High", "Wide")
+# Attacking in the climbing tiers (Série B/C — chase goals/promotion), balanced
+# once established in Série A.
+TACTIC_CLIMB = tactics_index("F433", "Attacking", "Fast", "High", "Wide")
 TACTIC_A = tactics_index("F4231", "Balanced", "Normal", "Medium", "Normal")
 
 
 def greedy_action(obs, mask, buys_this_season: int) -> int:
     in_transfer = obs[0] > 0.5
     if not in_transfer:
-        return TACTIC_A if obs[O_TIER_IS_B] < 0.5 else TACTIC_B
+        return TACTIC_A if obs[O_TIER_IS_A] > 0.5 else TACTIC_CLIMB
 
     # Transfer phase: pick the best-overall valid, affordable buy that leaves a
     # buffer; otherwise end the market.

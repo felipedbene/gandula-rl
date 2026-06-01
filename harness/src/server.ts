@@ -32,11 +32,11 @@ import {
   type LastSeason,
   type Phase,
 } from "./encode";
-import { userOutcomeFromPRResult } from "/Users/felipe/Projects/gandula/web/src/util/promotion";
-import { playerOverall, playerPrice } from "/Users/felipe/Projects/gandula/web/src/util/transfer-market";
-import { points } from "/Users/felipe/Projects/gandula/web/src/types";
+import { userOutcomeFromPRResult } from "/home/felipe/Projects/gandula/web/src/util/promotion";
+import { playerOverall, playerPrice } from "/home/felipe/Projects/gandula/web/src/util/transfer-market";
+import { points } from "/home/felipe/Projects/gandula/web/src/types";
 import { teamById } from "./teams-node";
-import type { UserTactics } from "/Users/felipe/Projects/gandula/web/src/persistence";
+import type { UserTactics } from "/home/felipe/Projects/gandula/web/src/persistence";
 
 type TransferRec = { kind: "buy" | "sell"; playerId: number; name: string; position: string; price: number };
 type SeasonRec = {
